@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم سكواد تاشيني (TAZHINI BOT)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+    <!-- تحديث تلقائي للصفحة كل 5 ثوان2 لتحديث الحالة -->
+    <meta http-equiv="refresh" content="5">
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- الهيدر -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500 mb-2">
+                TAZHINI BOT DASHBOARD
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base">لوحة تحكم سكواد فري فاير (سيرفر الشرق الأوسط - MENA)</p>
+            <div class="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-600/50 text-emerald-400 text-xs font-semibold">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                السِكواد نشط ويلعب الآن (4 حسابات متصلة)
+            </div>
+        </header>
+
+        <!-- إحصائيات عامة وسكواد -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 shadow-lg">
+                <div class="text-gray-400 text-sm mb-1">حالة السكواد</div>
+                <div class="text-xl font-bold text-emerald-400">متصل وجاهز للعب 🟢</div>
+            </div>
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 shadow-lg">
+                <div class="text-gray-400 text-sm mb-1">الوضع / النمط</div>
+                <div class="text-xl font-bold text-amber-400">Battle Royale (سيرفر ME)</div>
+            </div>
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 shadow-lg">
+                <div class="text-gray-400 text-sm mb-1">إجمالي المباريات الملعوبة</div>
+                <div class="text-xl font-bold text-cyan-400" id="total-matches">جاري التحديث...</div>
+            </div>
+        </div>
+
+        <!-- جدول أو بطاقات الحسابات الأربعة -->
+        <h2 class="text-xl font-bold mb-4 text-gray-200 border-r-4 border-red-500 pr-3">الحسابات الأربعة في السكواد</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="accounts-container">
+            <!-- سيتم تعبئة الحسابات تلقائياً عبر السيرفر أو القالب -->
+            {% for uid, acc in accounts.items() %}
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-xl flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-amber-500"></div>
+                
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-800 text-gray-300">UID: {{ uid }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full 
+                            {% if acc.status == 'IN_MATCH' %} bg-amber-950 text-amber-400 border border-amber-800/50 
+                            {% elif acc.status == 'ONLINE' %} bg-emerald-950 text-emerald-400 border border-emerald-800/50 
+                            {% else %} bg-gray-800 text-gray-400 {% endif %}">
+                            {{ acc.status }}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white mb-2 truncate">{{ acc.nickname }}</h3>
+
+                    <div class="space-y-1.5 text-sm text-gray-300 mb-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">المستوى (Level):</span>
+                            <span class="font-semibold text-amber-400">{{ acc.level }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">الخبرة (EXP):</span>
+                            <span class="font-semibold">{{ acc.exp }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">الإعجابات (Likes):</span>
+                            <span class="font-semibold text-pink-400">❤️ {{ acc.likes }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">المنطقة:</span>
+                            <span class="font-semibold text-cyan-400">{{ acc.region }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs">
+                    <span class="text-gray-400">المباريات المكتملة:</span>
+                    <span class="font-bold text-emerald-400 text-sm bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                        ⚔️ {{ acc.matches }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- تذييل الصفحة -->
+        <footer class="mt-12 text-center text-xs text-gray-500 border-t border-gray-900 pt-6">
+            تم التطوير بواسطة Team RBC &bull; تحديث حي ومستمر
+        </footer>
+    </div>
+
+</body>
+</html>
