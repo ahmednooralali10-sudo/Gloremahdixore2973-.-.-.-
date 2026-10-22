@@ -11,7 +11,7 @@
     <style>
         body { font-family: 'Cairo', sans-serif; }
     </style>
-    <!-- تحديث تلقائي للصفحة كل 5 ثوان2 لتحديث الحالة -->
+    <!-- تحديث تلقائي للصفحة كل 5 ثوانٍ -->
     <meta http-equiv="refresh" content="5">
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen p-4 md:p-8">
@@ -25,11 +25,11 @@
             <p class="text-gray-400 text-sm md:text-base">لوحة تحكم سكواد فري فاير (سيرفر الشرق الأوسط - MENA)</p>
             <div class="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-600/50 text-emerald-400 text-xs font-semibold">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                السِكواد نشط ويلعب الآن (4 حسابات متصلة)
+                السِكواد نشط ويلعب الآن
             </div>
         </header>
 
-        <!-- إحصائيات عامة وسكواد -->
+        <!-- إحصائيات عامة -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 shadow-lg">
                 <div class="text-gray-400 text-sm mb-1">حالة السكواد</div>
@@ -40,61 +40,72 @@
                 <div class="text-xl font-bold text-amber-400">Battle Royale (سيرفر ME)</div>
             </div>
             <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 shadow-lg">
-                <div class="text-gray-400 text-sm mb-1">إجمالي المباريات الملعوبة</div>
-                <div class="text-xl font-bold text-cyan-400" id="total-matches">جاري التحديث...</div>
+                <div class="text-gray-400 text-sm mb-1">إجمالي المباريات (القلوري)</div>
+                <div class="text-xl font-bold text-cyan-400">
+                    {% set total_m = namespace(val=0) %}
+                    {% for uid, acc in accounts.items() %}
+                        {% set total_m.val = total_m.val + (acc.matches if acc.matches else 0) %}
+                    {% endfor %}
+                    {{ total_m.val }} مبارات
+                </div>
             </div>
         </div>
 
-        <!-- جدول أو بطاقات الحسابات الأربعة -->
+        <!-- بطاقات الحسابات -->
         <h2 class="text-xl font-bold mb-4 text-gray-200 border-r-4 border-red-500 pr-3">الحسابات الأربعة في السكواد</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="accounts-container">
-            <!-- سيتم تعبئة الحسابات تلقائياً عبر السيرفر أو القالب -->
-            {% for uid, acc in accounts.items() %}
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-xl flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-amber-500"></div>
-                
-                <div>
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-800 text-gray-300">UID: {{ uid }}</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full 
-                            {% if acc.status == 'IN_MATCH' %} bg-amber-950 text-amber-400 border border-amber-800/50 
-                            {% elif acc.status == 'ONLINE' %} bg-emerald-950 text-emerald-400 border border-emerald-800/50 
-                            {% else %} bg-gray-800 text-gray-400 {% endif %}">
-                            {{ acc.status }}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {% if accounts %}
+                {% for uid, acc in accounts.items() %}
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-xl flex flex-col justify-between">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-amber-500"></div>
+                    
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-800 text-gray-300">UID: {{ uid }}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full 
+                                {% if acc.status == 'IN_MATCH' %} bg-amber-950 text-amber-400 border border-amber-800/50 
+                                {% elif acc.status == 'ONLINE' %} bg-emerald-950 text-emerald-400 border border-emerald-800/50 
+                                {% else %} bg-gray-800 text-gray-400 {% endif %}">
+                                {{ acc.status if acc.status else 'OFFLINE' }}
+                            </span>
+                        </div>
+
+                        <h3 class="text-lg font-bold text-white mb-2 truncate">{{ acc.nickname if acc.nickname else 'لاعب' }}</h3>
+
+                        <div class="space-y-1.5 text-sm text-gray-300 mb-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">المستوى:</span>
+                                <span class="font-semibold text-amber-400">{{ acc.level if acc.level else 1 }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">الخبرة (EXP):</span>
+                                <span class="font-semibold">{{ acc.exp if acc.exp else 0 }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">الإعجابات:</span>
+                                <span class="font-semibold text-pink-400">❤️ {{ acc.likes if acc.likes else 0 }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">المنطقة:</span>
+                                <span class="font-semibold text-cyan-400">{{ acc.region if acc.region else 'ME' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs">
+                        <span class="text-gray-400">المباريات (القلوري):</span>
+                        <span class="font-bold text-emerald-400 text-sm bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                            ⚔️ {{ acc.matches if acc.matches else 0 }}
                         </span>
                     </div>
-
-                    <h3 class="text-lg font-bold text-white mb-2 truncate">{{ acc.nickname }}</h3>
-
-                    <div class="space-y-1.5 text-sm text-gray-300 mb-4">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">المستوى (Level):</span>
-                            <span class="font-semibold text-amber-400">{{ acc.level }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">الخبرة (EXP):</span>
-                            <span class="font-semibold">{{ acc.exp }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">الإعجابات (Likes):</span>
-                            <span class="font-semibold text-pink-400">❤️ {{ acc.likes }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">المنطقة:</span>
-                            <span class="font-semibold text-cyan-400">{{ acc.region }}</span>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs">
-                    <span class="text-gray-400">المباريات المكتملة:</span>
-                    <span class="font-bold text-emerald-400 text-sm bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/40">
-                        ⚔️ {{ acc.matches }}
-                    </span>
+                {% endfor %}
+            {% else %}
+                <div class="col-span-full text-center py-12 text-gray-500 bg-gray-900/50 rounded-2xl border border-gray-800">
+                    لا توجد حسابات مسجلة حالياً، جاري تحميل الحسابات...
                 </div>
-            </div>
-            {% endfor %}
+            {% endif %}
         </div>
 
         <!-- تذييل الصفحة -->
